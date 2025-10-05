@@ -121,3 +121,21 @@ class FeedForward:
         hidden = gelu(np.matmul(x, self.W1) + self.b1)
         output = np.matmul(hidden, self.W2) + self.b2
         return output
+
+
+class TransformerBlock:
+    def __init__(self, d_model, num_heads, d_ff):
+        self.attention = MultiHeadAttention(d_model, num_heads)
+        self.ffn = FeedForward(d_model, d_ff)
+        self.ln1 = LayerNorm(d_model)
+        self.ln2 = LayerNorm(d_model)
+
+    def forward(self, x, mask=None):
+        # pre-norm
+        attn_output = self.attention.forward(self.ln1.forward(x), mask)
+        x = x + attn_output
+
+        ffn_output = self.ffn.forward(self.ln2.forward(x))
+        x = x + ffn_output
+
+        return x
