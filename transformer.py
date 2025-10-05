@@ -40,7 +40,7 @@ def gelu(x):
 
 
 class LayerNorm:
-    def __init__(self, d_model, eps=1e-6):
+    def __init__(self, d_model, eps=1e-5):
         self.d_model = d_model
         self.eps = eps
         self.gamma = np.ones(d_model)
