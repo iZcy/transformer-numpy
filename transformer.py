@@ -88,16 +88,16 @@ class MultiHeadAttention:
 
         self.attention = ScaledDotProductAttention()
 
+    def split_heads(self, x, batch_size, seq_len):
+        x = x.reshape(batch_size, seq_len, self.num_heads, self.d_k)
+        return x.transpose(0, 2, 1, 3)
+
     def forward(self, x, mask=None):
         batch_size, seq_len, _ = x.shape
 
-        Q = np.matmul(x, self.W_q).reshape(batch_size, seq_len, self.num_heads, self.d_k)
-        K = np.matmul(x, self.W_k).reshape(batch_size, seq_len, self.num_heads, self.d_k)
-        V = np.matmul(x, self.W_v).reshape(batch_size, seq_len, self.num_heads, self.d_k)
-
-        Q = Q.transpose(0, 2, 1, 3)
-        K = K.transpose(0, 2, 1, 3)
-        V = V.transpose(0, 2, 1, 3)
+        Q = self.split_heads(np.matmul(x, self.W_q), batch_size, seq_len)
+        K = self.split_heads(np.matmul(x, self.W_k), batch_size, seq_len)
+        V = self.split_heads(np.matmul(x, self.W_v), batch_size, seq_len)
 
         attn_output, attn_weights = self.attention.forward(Q, K, V, mask)
 
