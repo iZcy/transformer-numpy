@@ -10,7 +10,7 @@ class TokenEmbedding:
 
     def forward(self, x):
         # x: (batch, seq_len)
-        return self.embedding[x]  # (batch, seq_len, d_model)
+        return self.embedding[x] * np.sqrt(self.d_model)  # scale embedding
 
 
 class PositionalEncoding:
