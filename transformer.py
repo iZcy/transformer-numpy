@@ -28,3 +28,12 @@ class PositionalEncoding:
         # x: (batch, seq_len, d_model)
         seq_len = x.shape[1]
         return x + self.pe[:seq_len]
+
+
+def softmax(x, axis=-1):
+    exp_x = np.exp(x - np.max(x, axis=axis, keepdims=True))
+    return exp_x / np.sum(exp_x, axis=axis, keepdims=True)
+
+
+def gelu(x):
+    return 0.5 * x * (1 + np.tanh(np.sqrt(2 / np.pi) * (x + 0.044715 * x**3)))
