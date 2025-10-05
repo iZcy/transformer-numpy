@@ -65,10 +65,12 @@ def test_full_model():
 
     logits, probs = model.forward(x)
 
-    assert logits.shape == (batch_size, seq_len, vocab_size)
-    assert probs.shape == (batch_size, vocab_size)
+    assert logits.shape == (batch_size, seq_len, vocab_size), f"Expected {(batch_size, seq_len, vocab_size)}, got {logits.shape}"
+    assert probs.shape == (batch_size, vocab_size), f"Expected {(batch_size, vocab_size)}, got {probs.shape}"
+    assert np.allclose(np.sum(probs, axis=-1), 1.0), "Probabilities should sum to 1"
     print(f"✓ Full model logits: {logits.shape}")
     print(f"✓ Next token probs: {probs.shape}")
+    print(f"✓ Probability sum check passed")
 
 
 if __name__ == "__main__":
