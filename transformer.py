@@ -1,6 +1,7 @@
 import numpy as np
 
-# basic transformer implementation
+# Transformer architecture from scratch
+# Decoder-only (GPT-style) implementation
 
 class TokenEmbedding:
     def __init__(self, vocab_size, d_model):
