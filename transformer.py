@@ -51,3 +51,20 @@ class LayerNorm:
         var = np.var(x, axis=-1, keepdims=True)
         x_norm = (x - mean) / np.sqrt(var + self.eps)
         return self.gamma * x_norm + self.beta
+
+
+class ScaledDotProductAttention:
+    def __init__(self):
+        pass
+
+    def forward(self, Q, K, V, mask=None):
+        # Q, K, V: (batch, seq_len, d_k)
+        d_k = Q.shape[-1]
+        scores = np.matmul(Q, K.transpose(0, 2, 1)) / np.sqrt(d_k)
+
+        if mask is not None:
+            scores = scores + mask
+
+        attn_weights = softmax(scores, axis=-1)
+        output = np.matmul(attn_weights, V)
+        return output, attn_weights
