@@ -131,7 +131,7 @@ class TransformerBlock:
         self.ln2 = LayerNorm(d_model)
 
     def forward(self, x, mask=None):
-        # pre-norm
+        # pre-norm with residual
         attn_output = self.attention.forward(self.ln1.forward(x), mask)
         x = x + attn_output
 
@@ -139,3 +139,39 @@ class TransformerBlock:
         x = x + ffn_output
 
         return x
+
+
+def create_causal_mask(seq_len):
+    mask = np.triu(np.ones((seq_len, seq_len)), k=1)
+    return mask
+
+
+class GPTModel:
+    def __init__(self, vocab_size, d_model, num_heads, d_ff, num_layers, max_len=5000):
+        self.vocab_size = vocab_size
+        self.d_model = d_model
+
+        self.token_embedding = TokenEmbedding(vocab_size, d_model)
+        self.pos_encoding = PositionalEncoding(d_model, max_len)
+
+        self.blocks = [TransformerBlock(d_model, num_heads, d_ff) for _ in range(num_layers)]
+
+        self.ln_final = LayerNorm(d_model)
+        self.output_proj = np.random.randn(d_model, vocab_size) * 0.01
+
+    def forward(self, x):
+        # x: (batch, seq_len)
+        batch_size, seq_len = x.shape
+
+        mask = create_causal_mask(seq_len)
+
+        x = self.token_embedding.forward(x)
+        x = self.pos_encoding.forward(x)
+
+        for block in self.blocks:
+            x = block.forward(x, mask)
+
+        x = self.ln_final.forward(x)
+        logits = np.matmul(x, self.output_proj)
+
+        return logits
