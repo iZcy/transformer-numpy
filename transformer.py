@@ -101,6 +101,7 @@ class MultiHeadAttention:
 
         attn_output, attn_weights = self.attention.forward(Q, K, V, mask)
 
+        attn_output = attn_output.transpose(0, 2, 1, 3)
         attn_output = attn_output.reshape(batch_size, seq_len, self.d_model)
         output = np.matmul(attn_output, self.W_o)
 
