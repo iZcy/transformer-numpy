@@ -11,6 +11,15 @@
 
 \geometry{margin=2cm}
 
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true
+}
+
 \title{\textbf{Laporan Implementasi Transformer dari Nol dengan NumPy}}
 \author{Implementasi Decoder-Only Transformer (GPT-style)}
 \date{}
@@ -49,7 +58,11 @@ Untuk memvalidasi implementasi, dilakukan serangkaian pengujian terhadap dimensi
 
 Pengujian dimensi tensor menunjukkan bahwa setiap komponen menghasilkan output dengan shape yang sesuai ekspektasi. Token embedding menghasilkan tensor $(2, 10, 64)$ yang kemudian ditambahkan dengan positional encoding dengan dimensi yang sama. Setelah melewati multi-head attention, dimensi tetap terjaga di $(2, 10, 64)$. Output akhir model berupa logits dengan shape $(2, 10, 100)$ yang merepresentasikan skor untuk setiap token dalam vocabulary pada setiap posisi sequence. Untuk prediksi token berikutnya, diambil distribusi probabilitas pada posisi terakhir menghasilkan shape $(2, 100)$.
 
-Verifikasi operasi softmax dilakukan dengan memastikan bahwa jumlah probabilitas untuk setiap sample bernilai 1.0 menggunakan assertion \texttt{np.allclose(np.sum(probs, axis=-1), 1.0)}. Test ini berhasil passed, mengkonfirmasi bahwa distribusi probabilitas sudah dinormalisasi dengan benar. Untuk causal mask, dilakukan pengecekan bahwa mask yang dihasilkan berbentuk upper triangular matrix, dimana setiap baris $i$ hanya memiliki nilai 0 pada kolom $\leq i$ dan nilai 1 pada kolom $> i$, memastikan properti autoregressive terjaga dengan baik.
+Verifikasi operasi softmax dilakukan dengan memastikan bahwa jumlah probabilitas untuk setiap sample bernilai 1.0 menggunakan assertion \texttt{np.allclose(np.sum(probs, axis=-1), 1.0)}. Test ini berhasil passed, mengkonfirmasi bahwa distribusi probabilitas sudah dinormalisasi dengan benar. Untuk causal mask, dilakukan pengecekan bahwa mask yang dihasilkan berbentuk upper triangular matrix, dimana setiap baris $i$ hanya memiliki nilai 0 pada kolom $\leq i$ dan nilai 1 pada kolom $> i$, memastikan properti autoregressive terjaga dengan baik. Berikut adalah screenshot hasil eksekusi program pengujian:
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{test_screenshot.png}
+\end{center}
 
 Secara keseluruhan, implementasi decoder-only Transformer menggunakan NumPy telah berhasil direalisasikan dengan semua komponen bekerja sesuai spesifikasi matematis. Source code lengkap dapat diakses di: \url{https://github.com/iZcy/transformer-numpy}
 
