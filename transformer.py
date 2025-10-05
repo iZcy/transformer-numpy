@@ -174,4 +174,7 @@ class GPTModel:
         x = self.ln_final.forward(x)
         logits = np.matmul(x, self.output_proj)
 
-        return logits
+        # get probability distribution for next token
+        probs = softmax(logits[:, -1, :], axis=-1)
+
+        return logits, probs
