@@ -73,3 +73,35 @@ class ScaledDotProductAttention:
         attn_weights = softmax(scores, axis=-1)
         output = np.matmul(attn_weights, V)
         return output, attn_weights
+
+
+class MultiHeadAttention:
+    def __init__(self, d_model, num_heads):
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.d_k = d_model // num_heads
+
+        self.W_q = np.random.randn(d_model, d_model) * 0.01
+        self.W_k = np.random.randn(d_model, d_model) * 0.01
+        self.W_v = np.random.randn(d_model, d_model) * 0.01
+        self.W_o = np.random.randn(d_model, d_model) * 0.01
+
+        self.attention = ScaledDotProductAttention()
+
+    def forward(self, x, mask=None):
+        batch_size, seq_len, _ = x.shape
+
+        Q = np.matmul(x, self.W_q).reshape(batch_size, seq_len, self.num_heads, self.d_k)
+        K = np.matmul(x, self.W_k).reshape(batch_size, seq_len, self.num_heads, self.d_k)
+        V = np.matmul(x, self.W_v).reshape(batch_size, seq_len, self.num_heads, self.d_k)
+
+        Q = Q.transpose(0, 2, 1, 3)
+        K = K.transpose(0, 2, 1, 3)
+        V = V.transpose(0, 2, 1, 3)
+
+        attn_output, attn_weights = self.attention.forward(Q, K, V, mask)
+
+        attn_output = attn_output.reshape(batch_size, seq_len, self.d_model)
+        output = np.matmul(attn_output, self.W_o)
+
+        return output
